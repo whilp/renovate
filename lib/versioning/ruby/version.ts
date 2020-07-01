@@ -1,5 +1,5 @@
 import { diff, major, minor, patch, prerelease } from '@snyk/ruby-semver';
-import { create } from '@snyk/ruby-semver/lib/ruby/gem-version';
+import GemVersion from '@snyk/ruby-semver/lib/ruby/gem-version';
 
 interface RubyVersion {
   major: number;
@@ -19,12 +19,14 @@ const adapt = (left: string, right: string): string =>
   left.split('.').slice(0, right.split('.').length).join('.');
 
 const floor = (version: string): string =>
-  [...create(version).release().getSegments().slice(0, -1), 0].join('.');
+  [...GemVersion.create(version).release().getSegments().slice(0, -1), 0].join(
+    '.'
+  );
 
 // istanbul ignore next
 const incrementLastSegment = (version: string): string => {
-  const segments = create(version).release().getSegments();
-  const nextLast = parseInt(segments.pop(), 10) + 1;
+  const segments = GemVersion.create(version).release().getSegments();
+  const nextLast = Number(segments.pop()) + 1;
 
   return [...segments, nextLast].join('.');
 };
@@ -72,9 +74,10 @@ const increment = (from: string, to: string): string => {
 
 // istanbul ignore next
 const decrement = (version: string): string => {
-  const segments = create(version).release().getSegments();
+  const segments = GemVersion.create(version).release().getSegments();
   const nextSegments = segments
     .reverse()
+    .map(Number)
     .reduce((accumulator: number[], segment: number, index: number) => {
       if (index === 0) {
         return [segment - 1];

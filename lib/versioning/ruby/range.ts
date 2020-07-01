@@ -1,5 +1,5 @@
-import { parse as _parse } from '@snyk/ruby-semver/lib/ruby/gem-requirement';
-import { create } from '@snyk/ruby-semver/lib/ruby/gem-version';
+import GemRequirement from '@snyk/ruby-semver/lib/ruby/gem-requirement';
+import GemVersion from '@snyk/ruby-semver/lib/ruby/gem-version';
 import { logger } from '../../logger';
 import { EQUAL, GT, GTE, LT, LTE, NOT_EQUAL, PGTE } from './operator';
 
@@ -27,16 +27,10 @@ const parse = (range: string): Range => {
   };
 };
 
-interface GemVersion {
-  release(): GemVersion;
-  compare(ver: GemVersion): number;
-  bump(): GemVersion;
-}
-type GemRequirement = [string, GemVersion];
-
 const ltr = (version: string, range: string): boolean => {
-  const gemVersion: GemVersion = create(version);
-  const requirements: GemRequirement[] = range.split(',').map(_parse);
+  const gemVersion: GemVersion = GemVersion.create(version);
+  // eslint-disable-next-line @typescript-eslint/unbound-method
+  const requirements = range.split(',').map(GemRequirement.parse);
 
   const results = requirements.map(([operator, ver]) => {
     switch (operator) {

@@ -1756,6 +1756,9 @@
     "@types/glob" "*"
     "@types/node" "*"
 
+"@types/snyk__ruby-semver@../DefinitelyTyped/types/snyk__ruby-semver":
+  version "0.0.0"
+
 "@types/stack-utils@^1.0.1":
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/@types/stack-utils/-/stack-utils-1.0.1.tgz#0a851d3bd96498fa25c33ab7278ed3bd65f06c3e"
