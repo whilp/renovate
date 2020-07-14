@@ -7,6 +7,7 @@ import * as memCache from '../util/cache/memory';
 import { clone } from '../util/clone';
 import * as allVersioning from '../versioning';
 import datasources from './api.generated';
+import { CdnJs } from './cdnjs';
 import {
   Datasource,
   DigestConfig,
@@ -25,7 +26,11 @@ export const getDatasourceList = (): string[] => Array.from(datasources.keys());
 
 const cacheNamespace = 'datasource-releases';
 
-function load(datasource: string): Promise<Datasource> {
+function getDatasourceFor(datasource: string): Promise<Datasource> {
+  datasources.set(
+    'cdnjs',
+    new Promise<Datasource>((resolve) => resolve(new CdnJs()))
+  );
   return datasources.get(datasource);
 }
 
@@ -166,11 +171,14 @@ async function fetchReleases(
   config: GetReleasesInternalConfig
 ): Promise<ReleaseResult | null> {
   const { datasource: datasourceName } = config;
-  if (!datasourceName || !datasources.has(datasourceName)) {
+  if (
+    !datasourceName ||
+    (await getDatasourceFor(datasourceName)) === undefined
+  ) {
     logger.warn('Unknown datasource: ' + datasourceName);
     return null;
   }
-  const datasource = await load(datasourceName);
+  const datasource = await getDatasourceFor(datasourceName);
   const registryUrls = resolveRegistryUrls(datasource, config.registryUrls);
   let dep: ReleaseResult = null;
   try {
@@ -276,14 +284,14 @@ export async function getPkgReleases(
 }
 
 export async function supportsDigests(config: DigestConfig): Promise<boolean> {
-  return 'getDigest' in (await load(config.datasource));
+  return 'getDigest' in (await getDatasourceFor(config.datasource));
 }
 
 export async function getDigest(
   config: DigestConfig,
   value?: string
 ): Promise<string | null> {
-  const datasource = await load(config.datasource);
+  const datasource = await getDatasourceFor(config.datasource);
   const lookupName = config.lookupName || config.depName;
   const registryUrls = resolveRegistryUrls(datasource, config.registryUrls);
   return datasource.getDigest(
@@ -293,6 +301,6 @@ export async function getDigest(
 }
 
 export async function getDefaultConfig(datasource: string): Promise<object> {
-  const loadedDatasource = await load(datasource);
+  const loadedDatasource = await getDatasourceFor(datasource);
   return loadedDatasource?.defaultConfig || {};
 }

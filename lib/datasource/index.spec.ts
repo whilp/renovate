@@ -30,7 +30,7 @@ describe('datasource/index', () => {
     expect(datasource.getDatasources()).toBeDefined();
     expect(datasource.getDatasourceList()).toBeDefined();
   });
-  it('validates dataource', async () => {
+  it('validates datsource', async () => {
     function validateDatasource(
       module: datasource.Datasource,
       name: string
@@ -43,9 +43,16 @@ describe('datasource/index', () => {
       }
       return true;
     }
+    function filterClassBasedDatasources(name: string): boolean {
+      return !['cdnjs'].includes(name);
+    }
     const dss = datasource.getDatasources();
 
-    const loadedDs = loadModules(__dirname, validateDatasource);
+    const loadedDs = loadModules(
+      __dirname,
+      validateDatasource,
+      filterClassBasedDatasources
+    );
     expect(Array.from(dss.keys())).toEqual(Object.keys(loadedDs));
 
     for (const dsName of dss.keys()) {
@@ -79,6 +86,14 @@ describe('datasource/index', () => {
       await datasource.getPkgReleases({
         datasource: 'gitbucket',
         depName: 'some/dep',
+      })
+    ).toBeNull();
+  });
+  it('returns class datasource', async () => {
+    expect(
+      await datasource.getPkgReleases({
+        datasource: 'cdnjs',
+        depName: null,
       })
     ).toBeNull();
   });

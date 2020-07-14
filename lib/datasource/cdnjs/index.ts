@@ -2,6 +2,7 @@ import { ExternalHostError } from '../../types/errors/external-host-error';
 import { Http } from '../../util/http';
 import { CachePromise, cacheAble } from '../cache';
 import { GetReleasesConfig, ReleaseResult } from '../common';
+import { Datasource } from '../datasource';
 
 export const id = 'cdnjs';
 
@@ -27,38 +28,42 @@ async function downloadLibrary(library: string): CachePromise<CdnjsResponse> {
   return { data: (await http.getJson<CdnjsResponse>(url)).body };
 }
 
-export async function getReleases({
-  lookupName,
-}: GetReleasesConfig): Promise<ReleaseResult | null> {
-  // Each library contains multiple assets, so we cache at the library level instead of per-asset
-  const library = lookupName.split('/')[0];
-  try {
-    const { assets, homepage, repository } = await cacheAble({
-      id,
-      lookup: library,
-      cb: downloadLibrary,
-    });
-    if (!assets) {
-      return null;
-    }
-    const assetName = lookupName.replace(`${library}/`, '');
-    const releases = assets
-      .filter(({ files }) => files.includes(assetName))
-      .map(({ version, sri }) => ({ version, newDigest: sri[assetName] }));
+export class CdnJs extends Datasource {
+  readonly id = 'cdnjs';
 
-    const result: ReleaseResult = { releases };
+  // eslint-disable-next-line class-methods-use-this
+  async getReleases({
+    lookupName,
+  }: GetReleasesConfig): Promise<ReleaseResult | null> {
+    const library = lookupName.split('/')[0];
+    try {
+      const { assets, homepage, repository } = await cacheAble({
+        id,
+        lookup: library,
+        cb: downloadLibrary,
+      });
+      if (!assets) {
+        return null;
+      }
+      const assetName = lookupName.replace(`${library}/`, '');
+      const releases = assets
+        .filter(({ files }) => files.includes(assetName))
+        .map(({ version, sri }) => ({ version, newDigest: sri[assetName] }));
 
-    if (homepage) {
-      result.homepage = homepage;
+      const result: ReleaseResult = { releases };
+
+      if (homepage) {
+        result.homepage = homepage;
+      }
+      if (repository?.url) {
+        result.sourceUrl = repository.url;
+      }
+      return result;
+    } catch (err) {
+      if (err.statusCode !== 404) {
+        throw new ExternalHostError(err);
+      }
+      throw err;
     }
-    if (repository?.url) {
-      result.sourceUrl = repository.url;
-    }
-    return result;
-  } catch (err) {
-    if (err.statusCode !== 404) {
-      throw new ExternalHostError(err);
-    }
-    throw err;
   }
 }

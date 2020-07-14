@@ -9,12 +9,13 @@ if (!fs.existsSync('lib')) {
   shell.exit(0);
 }
 
-function findModules(dirname: string): string[] {
+function findModules(dirname: string, excludes: string[] = []): string[] {
   return fs
     .readdirSync(dirname, { withFileTypes: true })
     .filter((dirent) => dirent.isDirectory())
     .map((dirent) => dirent.name)
     .filter((name) => !name.startsWith('__'))
+    .filter((name) => !excludes.includes(name))
     .sort();
 }
 async function updateFile(file: string, code: string): Promise<void> {
@@ -74,7 +75,8 @@ import { Datasource } from './common';
 const api = new Map<string, Promise<Datasource>>();
 export default api;
 `;
-    for (const ds of findModules('lib/datasource')) {
+    const datasourceExcludes = ['cdnjs'];
+    for (const ds of findModules('lib/datasource', datasourceExcludes)) {
       code += `api.set('${ds}', import('./${ds}'));\n`;
     }
     await updateFile('lib/datasource/api.generated.ts', code);
