@@ -30,7 +30,7 @@ describe('datasource/index', () => {
     expect(datasource.getDatasources()).toBeDefined();
     expect(datasource.getDatasourceList()).toBeDefined();
   });
-  it('validates datsource', async () => {
+  it('validates datasource', async () => {
     function validateDatasource(
       module: datasource.Datasource,
       name: string
