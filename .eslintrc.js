@@ -81,6 +81,9 @@ module.exports = {
       },
     ], // disable until proper interfaced api
     curly: [2, 'all'],
+    // next 2 rules disabled due to https://github.com/microsoft/TypeScript/issues/20024
+    '@typescript-eslint/no-unsafe-assignment': 0,
+    '@typescript-eslint/no-unsafe-member-access': 0,
   },
   settings: {
     // https://github.com/benmosher/eslint-plugin-import/issues/1618
