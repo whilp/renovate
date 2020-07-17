@@ -12,12 +12,12 @@ export function applyHostRules(url: string, inOptions: any): any {
     }) || /* istanbul ignore next: can only happen in tests */ {};
   const { username, password, token, enabled } = foundRules;
   if (options.headers?.authorization || options.auth || options.token) {
-    logger.trace('Authorization already set for host: ' + options.hostname);
+    logger.trace(`Authorization already set for host ${options.hostname}`);
   } else if (password) {
-    logger.trace('Applying Basic authentication for host ' + options.hostname);
+    logger.trace(`Applying Basic authentication for host ${options.hostname}`);
     options.auth = `${username || ''}:${password}`;
   } else if (token) {
-    logger.trace('Applying Bearer authentication for host ' + options.hostname);
+    logger.trace(`Applying Bearer authentication for host ${options.hostname}`);
     options.token = token;
   } else if (enabled === false) {
     options.enabled = false;

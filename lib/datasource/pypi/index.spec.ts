@@ -201,7 +201,7 @@ describe('datasource/pypi', () => {
       httpMock
         .scope('https://pypi.org/simple/')
         .get('/dj-database-url')
-        .reply(200, htmlResponse + '');
+        .reply(200, htmlResponse);
       const config = {
         registryUrls: ['https://pypi.org/simple/'],
       };
@@ -219,7 +219,7 @@ describe('datasource/pypi', () => {
       httpMock
         .scope('https://some.registry.org/+simple/')
         .get('/dj-database-url')
-        .reply(200, htmlResponse + '');
+        .reply(200, htmlResponse);
       const config = {
         registryUrls: ['https://some.registry.org/+simple/'],
       };
@@ -237,7 +237,7 @@ describe('datasource/pypi', () => {
       httpMock
         .scope('https://pypi.org/simple/')
         .get('/image-collector')
-        .reply(200, mixedHyphensResponse + '');
+        .reply(200, mixedHyphensResponse);
       const config = {
         registryUrls: ['https://pypi.org/simple/'],
       };
@@ -291,7 +291,7 @@ describe('datasource/pypi', () => {
       httpMock
         .scope('https://pypi.org/simple/')
         .get('/dj-database-url')
-        .reply(200, badResponse + '');
+        .reply(200, badResponse);
       const config = {
         registryUrls: ['https://pypi.org/simple/'],
       };
@@ -312,7 +312,7 @@ describe('datasource/pypi', () => {
       httpMock
         .scope('https://custom.pypi.net/foo')
         .get('/dj-database-url')
-        .reply(200, htmlResponse + '');
+        .reply(200, htmlResponse);
       const config = {
         registryUrls: ['https://custom.pypi.net/foo'],
       };
