@@ -1,18 +1,21 @@
 import { resolve } from 'path';
 import { stat } from 'fs-extra';
-import Git from 'simple-git/promise';
 import { logger } from '../../logger';
 import { ExecOptions, exec } from '../../util/exec';
 import { readLocalFile, writeLocalFile } from '../../util/fs';
-import { getRepoStatus } from '../../util/git';
+import { StatusResult, getRepoStatus } from '../../util/git';
 import { Http } from '../../util/http';
 import { UpdateArtifact, UpdateArtifactsResult } from '../common';
-import { gradleWrapperFileName, prepareGradleCommand } from '../gradle/index';
+import {
+  extraEnv,
+  gradleWrapperFileName,
+  prepareGradleCommand,
+} from '../gradle/utils';
 
 const http = new Http('gradle-wrapper');
 
 async function addIfUpdated(
-  status: Git.StatusResult,
+  status: StatusResult,
   fileProjectPath: string
 ): Promise<UpdateArtifactsResult | null> {
   if (status.modified.includes(fileProjectPath)) {
@@ -84,6 +87,7 @@ export async function updateArtifacts({
       docker: {
         image: 'renovate/gradle',
       },
+      extraEnv,
     };
     try {
       await exec(cmd, execOptions);

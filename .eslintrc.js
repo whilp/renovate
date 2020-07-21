@@ -80,6 +80,8 @@ module.exports = {
         ignoreRestSiblings: false,
       },
     ], // disable until proper interfaced api
+    '@typescript-eslint/prefer-optional-chain': 2,
+    '@typescript-eslint/prefer-nullish-coalescing': 2,
     curly: [2, 'all'],
     // next 2 rules disabled due to https://github.com/microsoft/TypeScript/issues/20024
     '@typescript-eslint/no-unsafe-assignment': 0,
