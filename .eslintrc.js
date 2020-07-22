@@ -83,6 +83,7 @@ module.exports = {
     '@typescript-eslint/prefer-optional-chain': 1,
     '@typescript-eslint/prefer-nullish-coalescing': 2,
     curly: [2, 'all'],
+
     // next 2 rules disabled due to https://github.com/microsoft/TypeScript/issues/20024
     '@typescript-eslint/no-unsafe-assignment': 0,
     '@typescript-eslint/no-unsafe-member-access': 0,
@@ -98,6 +99,9 @@ module.exports = {
 
     '@typescript-eslint/unbound-method': 1,
     '@typescript-eslint/ban-types': 1,
+
+    'require-await': 2,
+
   },
   settings: {
     // https://github.com/benmosher/eslint-plugin-import/issues/1618
